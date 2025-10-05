@@ -33,4 +33,4 @@ build/
 .vscode/
 
 ### codes has api ###
-TestApiKey.java
+src/main/java/com/novidne/novidneaiagent/demo/invoke/TestApiKey.java
