@@ -1,8 +1,6 @@
 spring:
   application:
     name: novidne-ai-agent
-  profiles:
-    active: local
 server:
   port: 8123
   servlet:
