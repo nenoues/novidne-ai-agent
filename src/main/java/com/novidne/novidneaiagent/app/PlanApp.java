@@ -3,14 +3,18 @@ package com.novidne.novidneaiagent.app;
 import com.novidne.novidneaiagent.advisor.MyLoggerAdvisor;
 import com.novidne.novidneaiagent.chatmemory.FileBasedChatMemory;
 import com.novidne.novidneaiagent.chatmemory.RedisBasedChatMemory;
+import jakarta.annotation.Resource;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.client.advisor.MessageChatMemoryAdvisor;
+import org.springframework.ai.chat.client.advisor.QuestionAnswerAdvisor;
+import org.springframework.ai.chat.client.advisor.api.Advisor;
 import org.springframework.ai.chat.memory.ChatMemory;
 import org.springframework.ai.chat.memory.InMemoryChatMemory;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.model.ChatResponse;
+import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -85,7 +89,7 @@ public class PlanApp {
     public PlanApp(RedisBasedChatMemory redisBasedChatMemory, ChatModel dashscopeChatModel) {
         this.redisBasedChatMemory = redisBasedChatMemory;
         String fileDir = System.getProperty("user.dir") + "/tmp/chat-memory";
-//        FileBasedChatMemory fileBasedChatMemory = new FileBasedChatMemory(fileDir);
+        FileBasedChatMemory fileBasedChatMemory = new FileBasedChatMemory(fileDir);
 
 
         //初始化基于内存的对话记忆
@@ -156,4 +160,25 @@ public class PlanApp {
         // 返回聊天内容
         return planReport;  // 返回生成的计划报告
     }
+
+    @Resource
+    private VectorStore planAppVectorStore;
+
+    @Resource
+    private Advisor planAppRagCloudAdvisor;
+
+    public String doChatWithRag(String message, String chatId) {
+        ChatResponse chatResponse = chatClient.prompt().user(message).advisors(spec -> spec.param(CHAT_MEMORY_CONVERSATION_ID_KEY, chatId)  // 设置会话ID用于记忆检索
+                        .param(CHAT_MEMORY_RETRIEVE_SIZE_KEY, 10))  // 设置记忆检索数量为10条
+                .advisors(new MyLoggerAdvisor())
+//                .advisors(planAppRagCloudAdvisor)
+                .advisors(new QuestionAnswerAdvisor(planAppVectorStore))
+                .call()
+                .chatResponse();
+        String content = chatResponse.getResult().getOutput().getText();
+        log.info("content:{}", content);
+        return content;
+    }
+
+
 }

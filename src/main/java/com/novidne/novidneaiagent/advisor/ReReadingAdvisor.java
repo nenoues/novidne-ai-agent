@@ -13,21 +13,22 @@ import java.util.Map;
 public class ReReadingAdvisor implements CallAroundAdvisor, StreamAroundAdvisor {
 
 
-/**
- * 处理建议请求的前置方法，对原始请求进行增强处理
- * @param advisedRequest 原始的建议请求对象
- * @return 处理后的增强建议请求对象
- */
+    /**
+     * 处理建议请求的前置方法，对原始请求进行增强处理
+     *
+     * @param advisedRequest 原始的建议请求对象
+     * @return 处理后的增强建议请求对象
+     */
     private AdvisedRequest before(AdvisedRequest advisedRequest) {
 
-    // 创建用户参数的副本，避免修改原始参数
+        // 创建用户参数的副本，避免修改原始参数
         Map<String, Object> advisedUserParams = new HashMap<>(advisedRequest.userParams());
-    // 将用户文本作为re2_input_query参数添加到用户参数中
+        // 将用户文本作为re2_input_query参数添加到用户参数中
         advisedUserParams.put("re2_input_query", advisedRequest.userText());
 
-    // 使用构建器模式创建新的AdvisedRequest对象
-    // 设置用户文本为模板格式，包含原始查询和重复查询的提示
-    // 使用更新后的用户参数构建最终请求
+        // 使用构建器模式创建新的AdvisedRequest对象
+        // 设置用户文本为模板格式，包含原始查询和重复查询的提示
+        // 使用更新后的用户参数构建最终请求
         return AdvisedRequest.from(advisedRequest)
                 .userText("""
                         {re2_input_query}

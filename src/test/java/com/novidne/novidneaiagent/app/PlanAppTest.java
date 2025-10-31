@@ -35,4 +35,12 @@ class PlanAppTest {
         PlanApp.PlanReport planReport = planApp.doChatWithReport(message, chatId);
         Assertions.assertNotNull(planReport);
     }
+
+    @Test
+    void doChatWithRag() {
+        String chatId = UUID.randomUUID().toString();
+        String message = "我每天总是完不成自己的目标，心态不好，该怎么调整个人心态";
+        String answer = planApp.doChatWithRag(message, chatId);
+        Assertions.assertNotNull(answer);
+    }
 }

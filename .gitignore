@@ -39,3 +39,4 @@ build/
 ### codes has api ###
 src/main/java/com/novidne/novidneaiagent/demo/invoke/TestApiKey.java
 /src/main/resources/application-local.yml
+/src/main/resources/document/
