@@ -11,15 +11,19 @@ import org.springframework.context.annotation.Configuration;
 import java.util.List;
 
 @Configuration
-public class LoveAppVectorStoreConfig {
+public class PlanAppVectorStoreConfig {
     @Resource
     private PlanAppDocumentLoader planAppDocumentLoader;
+
+    @Resource
+    private MyKeyWordEnricher myKeyWordEnricher;
 
     @Bean
     VectorStore planAppVectorStore(DashScopeEmbeddingModel dashscopeEmbeddingModel) {
         SimpleVectorStore simpleVectorStore = SimpleVectorStore.builder(dashscopeEmbeddingModel).build();
         List<Document> planDocuments = planAppDocumentLoader.loadMarkdowns();
-        simpleVectorStore.add(planDocuments);
+        List<Document> enrichedDocuments = myKeyWordEnricher.enrichDocuments(planDocuments);
+        simpleVectorStore.add(enrichedDocuments);
         return simpleVectorStore;
     }
 }
