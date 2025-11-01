@@ -37,10 +37,12 @@ public class PlanAppDocumentLoader {
             for (Resource planDocumentsResource : planDocumentsResources) {
                 // 获取文件名
                 String planFileName = planDocumentsResource.getFilename();
+                String aspects = planFileName.substring(planFileName.length() - 9, planFileName.length() - 3);
                 MarkdownDocumentReaderConfig planDocumentReaderConfig = MarkdownDocumentReaderConfig.builder().withHorizontalRuleCreateDocument(true)
                         .withIncludeBlockquote(false)
                         .withIncludeBlockquote(false)
                         .withAdditionalMetadata("fileName", planFileName)
+                        .withAdditionalMetadata("aspects", aspects)
                         .build();
                 MarkdownDocumentReader reader = new MarkdownDocumentReader(planDocumentsResource, planDocumentReaderConfig);
                 planDocuments.addAll(reader.get());
